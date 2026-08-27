@@ -37,13 +37,8 @@ jobs:
           push: true
           platforms: linux/amd64
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
-          build-args: |
-            VITE_API_URL=${{ vars.VITE_API_URL || '' }}
-            VITE_KEYCLOAK_URL=${{ vars.VITE_KEYCLOAK_URL || '' }}
-            VITE_KEYCLOAK_REALM=${{ vars.VITE_KEYCLOAK_REALM || '' }}
-            VITE_KEYCLOAK_CLIENT_ID=${{ vars.VITE_KEYCLOAK_CLIENT_ID || '' }}
+            ghcr.io/${{ github.repository_owner }}/ne1_analogmonitor-server:latest
+            ghcr.io/${{ github.repository_owner }}/ne1_analogmonitor-server:${{ github.sha }}
 
   update-gitops:
     runs-on: ubuntu-latest
@@ -63,7 +58,7 @@ jobs:
         run: |
           cd gitops
           if ! grep -q '^image:' be/values.yaml 2>/dev/null; then
-            printf 'image:\n  repository: ghcr.io/${{ github.repository_owner }}/ne1_analogmonitor\n  tag: "%s"\n' "$IMAGE_TAG" > be/values.yaml
+            printf 'image:\n  repository: ghcr.io/${{ github.repository_owner }}/ne1_analogmonitor-server\n  tag: "%s"\n' "$IMAGE_TAG" > be/values.yaml
           else
             sed -i -E 's|^([[:space:]]*tag:[[:space:]]*")[^"]*(")$|\1'"$IMAGE_TAG"'\2|' be/values.yaml
           fi
