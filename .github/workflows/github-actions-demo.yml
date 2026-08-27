@@ -1,4 +1,4 @@
-name: Build and Push
+name: Build and Push - ne1_analogmonitor
 
 on:
   push:
@@ -53,7 +53,7 @@ jobs:
       - name: Checkout GitOps repo
         uses: actions/checkout@v4
         with:
-          repository: c112233c/subalarm-gitops
+          repository: c112233c/ne1_analogmonitor_gitops
           token: ${{ secrets.GITOPS_TOKEN }}
           path: gitops
 
@@ -63,7 +63,7 @@ jobs:
         run: |
           cd gitops
           if ! grep -q '^image:' app/values.yaml 2>/dev/null; then
-            printf 'image:\n  repository: ghcr.io/c112233c/subalarm\n  tag: "%s"\n' "$IMAGE_TAG" > app/values.yaml
+            printf 'image:\n  repository: ghcr.io/${{ github.repository_owner }}/ne1_analogmonitor\n  tag: "%s"\n' "$IMAGE_TAG" > app/values.yaml
           else
             sed -i -E 's|^([[:space:]]*tag:[[:space:]]*")[^"]*(")$|\1'"$IMAGE_TAG"'\2|' app/values.yaml
           fi

@@ -5,13 +5,14 @@ const path = require("path");
 const swaggerUi = require("swagger-ui-express");
 const yaml = require("js-yaml");
 const analogRoutes = require("./routes/analog.routes");
+const requireKeycloakAuth = require("./middleware/keycloak");
 const openApiSpec = yaml.load(
     fs.readFileSync(path.join(__dirname, "../openapi.yaml"), "utf8")
 );
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use("/api/analog", analogRoutes);
+app.use("/api/analog", requireKeycloakAuth, analogRoutes);
 
 app.get("/api/openapi.json", (req, res) => {
     res.json(openApiSpec);

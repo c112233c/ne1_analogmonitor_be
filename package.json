@@ -11,6 +11,7 @@
     "cors": "2.8.5",
     "dotenv": "16.4.7",
     "express": "5.1.0",
+    "jose": "^6.1.0",
     "js-yaml": "^5.4.1",
     "mysql2": "3.14.3",
     "swagger-ui-express": "^5.0.1"
