@@ -1,0 +1,212 @@
+openapi: 3.0.3
+info:
+  title: NE1 Analog Monitoring API
+  version: 1.0.0
+  description: API for SCADA analog metadata and historical min/max/avg data.
+servers:
+  - url: /
+    description: Current server
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      operationId: getHealth
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status:
+                    type: string
+                    example: ok
+  /api/analog/stations:
+    get:
+      summary: Get stations
+      operationId: getStations
+      responses:
+        '200':
+          description: Stations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Station'
+  /api/analog/stations/{sub}/bays:
+    get:
+      summary: Get bays for a station
+      operationId: getBays
+      parameters:
+        - $ref: '#/components/parameters/Sub'
+      responses:
+        '200':
+          description: Bays
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Bay'
+  /api/analog/stations/{sub}/bays/{bay}/points:
+    get:
+      summary: Get analog points for a station and bay
+      operationId: getPoints
+      parameters:
+        - $ref: '#/components/parameters/Sub'
+        - $ref: '#/components/parameters/Bay'
+      responses:
+        '200':
+          description: Analog points
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnalogPoint'
+  /api/analog/history:
+    get:
+      summary: Get historical analog data with metadata
+      operationId: getHistory
+      parameters:
+        - name: gid
+          in: query
+          required: true
+          schema:
+            type: string
+          example: '123456'
+        - name: from
+          in: query
+          required: true
+          description: Inclusive start datetime.
+          schema:
+            type: string
+            format: date-time
+          example: '2026-08-01T00:00:00'
+        - name: to
+          in: query
+          required: true
+          description: Exclusive end datetime.
+          schema:
+            type: string
+            format: date-time
+          example: '2026-08-08T00:00:00'
+      responses:
+        '200':
+          description: Historical data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryResponse'
+        '400':
+          description: Missing or invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  parameters:
+    Sub:
+      name: sub
+      in: path
+      required: true
+      schema:
+        type: string
+      example: KKA
+    Bay:
+      name: bay
+      in: path
+      required: true
+      schema:
+        type: string
+      example: OUT01
+  schemas:
+    Station:
+      type: object
+      required: [sub]
+      properties:
+        sub:
+          type: string
+          example: KKA
+    Bay:
+      type: object
+      required: [bay]
+      properties:
+        bay:
+          type: string
+          example: OUT01
+    AnalogPoint:
+      type: object
+      required: [gid, type]
+      properties:
+        gid:
+          type: string
+          example: '123456'
+        type:
+          type: string
+          enum: [P, Q, IA, IB, IC, PF]
+          example: P
+        unit:
+          type: string
+          nullable: true
+          example: MW
+    HistoryPoint:
+      type: object
+      required: [gid, sub, bay, type, unit]
+      properties:
+        gid:
+          type: string
+        sub:
+          type: string
+        bay:
+          type: string
+        type:
+          type: string
+        unit:
+          type: string
+          nullable: true
+    HistoryData:
+      type: object
+      required: [date_time, min, max, avg]
+      properties:
+        date_time:
+          type: string
+          format: date-time
+        min:
+          type: number
+          format: float
+          nullable: true
+        max:
+          type: number
+          format: float
+          nullable: true
+        avg:
+          type: number
+          format: float
+          nullable: true
+    HistoryResponse:
+      type: object
+      required: [point, data]
+      properties:
+        point:
+          oneOf:
+            - $ref: '#/components/schemas/HistoryPoint'
+            - type: 'null'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistoryData'
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
