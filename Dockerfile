@@ -8,6 +8,7 @@ COPY package*.json ./
 
 RUN npm ci --omit=dev && npm cache clean --force
 
+COPY openapi.yaml ./openapi.yaml
 COPY src ./src
 
 USER node

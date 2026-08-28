@@ -9,7 +9,6 @@ const requireKeycloakAuth = require("./middleware/keycloak");
 const openApiSpec = yaml.load(
     fs.readFileSync(path.join(__dirname, "../openapi.yaml"), "utf8")
 );
-console.log();
 const app = express();
 app.use(cors());
 app.use(express.json());
