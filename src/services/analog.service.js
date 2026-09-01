@@ -37,8 +37,8 @@ async function getHistory(gid, from, to) {
         FROM gid_detail d
         JOIN calculate_data c ON c.gid = d.gid
         WHERE d.gid = ?
-          AND c.date_time >= ?
-          AND c.date_time < ?
+          AND c.date_time > ?
+          AND c.date_time <= ?
         ORDER BY c.date_time
     `, [gid, from, to]);
     return rows;
@@ -62,8 +62,8 @@ async function getDetail(type, from, to, sub = "") {
           AND d.used = 'Y'
           AND d.sub IS NOT NULL
           AND d.bay IS NOT NULL
-          AND c.date_time >= ?
-          AND c.date_time < ?
+          AND c.date_time > ?
+          AND c.date_time <= ?
 ${whereSub}        ORDER BY c.date_time, d.sub, d.bay
     `, params);
     return rows;
