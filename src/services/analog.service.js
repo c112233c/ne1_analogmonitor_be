@@ -44,7 +44,15 @@ async function getHistory(gid, from, to) {
     return rows;
 }
 
-async function getDetail(type, from, to) {
+async function getDetail(type, from, to, sub = "") {
+    const params = [type, from, to];
+    let whereSub = "";
+
+    if (sub) {
+        whereSub = "          AND d.sub = ?\n";
+        params.push(sub);
+    }
+
     const [rows] = await db.query(`
         SELECT d.sub, d.bay, d.type, d.unit,
                c.date_time, c.min, c.max, c.avg
@@ -56,8 +64,8 @@ async function getDetail(type, from, to) {
           AND d.bay IS NOT NULL
           AND c.date_time >= ?
           AND c.date_time < ?
-        ORDER BY c.date_time, d.sub, d.bay
-    `, [type, from, to]);
+${whereSub}        ORDER BY c.date_time, d.sub, d.bay
+    `, params);
     return rows;
 }
 

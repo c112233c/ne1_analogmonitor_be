@@ -75,7 +75,7 @@ async function getHistory(req, res, next) {
 
 async function getDetail(req, res, next) {
     try {
-        const { type, from, to } = req.query;
+        const { type, from, to, sub } = req.query;
 
         if (!type || !from || !to) {
             return res.status(400).json({
@@ -94,7 +94,7 @@ async function getDetail(req, res, next) {
             return res.status(400).json({ message: "Date range must not exceed 31 days" });
         }
 
-        const rows = await service.getDetail(type, from, to);
+        const rows = await service.getDetail(type, from, to, sub);
 
         res.json({
             type,
